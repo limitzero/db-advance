@@ -1,2 +1,8 @@
 syntax: glob
 packages/SharpZipLib.0.86.0/*
+DbAdvance.Host/bin/*
+DbAdvance.suo
+DbAdvance.Host/DbAdvance.Host.csproj.user
+DbAdvance.Host/DbAdvance.Host.csproj.DotSettings.user
+DbAdvance.Host/obj/*
+_ReSharper.DbAdvance/*
