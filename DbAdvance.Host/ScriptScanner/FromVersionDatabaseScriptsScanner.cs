@@ -1,50 +1,49 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace DbAdvance.Host.ScriptScanner
 {
     public class FromVersionDatabaseScriptsScanner : IDatabaseScriptsScanner
     {
-        private readonly bool isCommit;
-        private readonly string version;
-
-        public FromVersionDatabaseScriptsScanner(ScanMode scanMode, string version)
-        {
-            isCommit = scanMode == ScanMode.Commit;
-            this.version = version;
-        }
-
-        public List<DatabaseScriptVersion> GetScripts(string packageRootPath)
+        public IEnumerable<DatabaseScriptVersion> GetScripts(string packageRootPath)
         {
             var directories = Directory.EnumerateDirectories(packageRootPath);
 
-            var filteredDirectories = Filter(directories);
-
-            var sorted = isCommit
-                ? filteredDirectories.OrderBy(d => d)
-                : filteredDirectories.OrderByDescending(d => d);
-
-            return sorted
+            return GetDeltas(directories)
                 .Select(d => new DatabaseScriptVersion
                     {
-                        Path = d,
-                        IsCommit = isCommit
+                        CommitScripts = GetDeltaContents(d.Item3, true),
+                        RollbackScripts = GetDeltaContents(d.Item3, false),
+                        FromVersion = d.Item1,
+                        ToVersion = d.Item2
                     })
                 .ToList();
         }
 
-        public IEnumerable<string> Filter(IEnumerable<string> enumerateDirectories)
+        private static IEnumerable<string> GetDeltaContents(string deltaPath, bool isCommit)
         {
-            return enumerateDirectories
+            return
+                Directory
+                    .EnumerateFiles(Path.Combine(deltaPath, isCommit ? "Commit" : "Rollback"), "*.sql")
+                    .OrderBy(fileName => fileName);
+        }
+
+        private static IEnumerable<Tuple<string, string, string>> GetDeltas(IEnumerable<string> directories)
+        {
+            var to = directories
                 .Select(d => new
                     {
                         Path = d,
                         Name = Path.GetFileName(d)
                     })
-                .OrderByDescending(d => d.Name)
-                .TakeWhile(d => d.Name != version)
-                .Select(d => d.Path);
+                .OrderBy(d => d.Name);
+
+            var from = to.Select(d => d.Name).Reverse().Skip(1).Union(new[] { (string)null }).Reverse();
+
+            return from.Zip(to, (fromVersion, toObject) => new Tuple<string, string, string>(fromVersion, toObject.Name, toObject.Path));
         }
     }
 }

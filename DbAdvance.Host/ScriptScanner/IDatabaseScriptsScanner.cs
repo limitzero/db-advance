@@ -4,6 +4,6 @@ namespace DbAdvance.Host.ScriptScanner
 {
     public interface IDatabaseScriptsScanner
     {
-        List<DatabaseScriptVersion> GetScripts(string packageRootPath);
+        IEnumerable<DatabaseScriptVersion> GetScripts(string packageRootPath);
     }
 }

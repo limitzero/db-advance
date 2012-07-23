@@ -8,23 +8,29 @@ namespace DbAdvance.Host
         {
             var logger = new Logger();
 
-            if (args.Length >= 2)
+            if (args.Length > 3)
             {
                 var command = args[0];
                 var packagePath = args[1];
-                var version = args[2];
-                var connectionString = args[3];
+                var connectionString = args[2];
+                var databaseName = args[3];
+
+                string version = null;
+                if (args.Length > 4)
+                {
+                    version = args[4];
+                }
 
                 var engine = GetEngine(logger);
 
                 switch (command)
                 {
                     case "-c":
-                        engine.CommitFromVersion(packagePath, version, connectionString);
+                        engine.CommitFromVersion(packagePath, version, connectionString, databaseName);
                         break;
 
                     case "-r":
-                        engine.RollbackToVersion(packagePath, version, connectionString);
+                        engine.RollbackToVersion(packagePath, version, connectionString, databaseName);
                         break;
 
                     default:
