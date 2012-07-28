@@ -47,20 +47,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseScriptsExecutor.cs" />
-    <Compile Include="DatabaseScriptVersion.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="DatabaseConnector.cs" />
+    <Compile Include="DatabaseConnectorFactory.cs" />
+    <Compile Include="Step.cs" />
+    <Compile Include="Package\Delta.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="FileSystem.cs" />
+    <Compile Include="IDatabaseConnectorConfiguration.cs" />
     <Compile Include="IFileSystem.cs" />
-    <Compile Include="ScriptScanner\FromVersionDatabaseScriptsScanner.cs" />
-    <Compile Include="ScriptScanner\IDatabaseScriptsScanner.cs" />
+    <Compile Include="Package\IDelta.cs" />
+    <Compile Include="Package\PackageReader.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptScanner\ScanMode.cs" />
     <Compile Include="Archiver\ZipArchiver.cs" />
     <Compile Include="Archiver\ZipItem.cs" />
+    <Compile Include="Package\ScriptAccessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

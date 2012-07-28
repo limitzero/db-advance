@@ -6,3 +6,5 @@ DbAdvance.Host/DbAdvance.Host.csproj.user
 DbAdvance.Host/DbAdvance.Host.csproj.DotSettings.user
 DbAdvance.Host/obj/*
 _ReSharper.DbAdvance/*
+DbAdvance.v11.suo
+DbAdvance.sln.DotSettings.user

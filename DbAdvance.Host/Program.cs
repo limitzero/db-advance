@@ -1,4 +1,7 @@
-﻿using DbAdvance.Host.Archiver;
+﻿using System.Collections.Generic;
+
+using DbAdvance.Host.Archiver;
+using DbAdvance.Host.Package;
 
 namespace DbAdvance.Host
 {
@@ -8,50 +11,67 @@ namespace DbAdvance.Host
         {
             var logger = new Logger();
 
-            if (args.Length > 3)
+            if (CheckParameters(args, logger, 3)) return;
+
+            var command = args[0];
+            var connectionString = args[1];
+            var databaseName = args[2];
+
+            var engine = GetEngine(logger, connectionString, databaseName);
+
+            
+            switch (command)
             {
-                var command = args[0];
-                var packagePath = args[1];
-                var connectionString = args[2];
-                var databaseName = args[3];
+                case "-c":
+                    if (CheckParameters(args, logger, 4)) return;
 
-                string version = null;
-                if (args.Length > 4)
-                {
-                    version = args[4];
-                }
+                    engine.ReportVersions();
+                    engine.Commit(args[3]);
 
-                var engine = GetEngine(logger);
+                    break;
 
-                switch (command)
-                {
-                    case "-c":
-                        engine.CommitFromVersion(packagePath, version, connectionString, databaseName);
-                        break;
+                case "-r":
+                    if (CheckParameters(args, logger, 4)) return;
 
-                    case "-r":
-                        engine.RollbackToVersion(packagePath, version, connectionString, databaseName);
-                        break;
+                    engine.ReportVersions();
+                    engine.Rollback(args[3]);
 
-                    default:
-                        logger.Log("Unknown command: {0}", command);
-                        PrintUsage(logger);
-                        break;
-                }
+                    break;
+
+                case "-rc":
+                    if (CheckParameters(args, logger, 5)) return;
+
+                    engine.ReportVersions();
+                    engine.RollbackAndCommit(args[3], args[4]);
+
+                    break;
+
+                default:
+                    logger.Log("Unknown command: {0}", command);
+                    PrintUsage(logger);
+                    break;
             }
-            else
+
+        }
+
+        private static bool CheckParameters(ICollection<string> args, ILogger logger, int number)
+        {
+            if (args.Count < number)
             {
                 PrintUsage(logger);
             }
+
+            return false;
         }
 
-        private static Engine GetEngine(ILogger logger)
+        private static Engine GetEngine(ILogger logger, string connectionString, string databaseName)
         {
             return new Engine(
-                logger, 
-                new ZipArchiver(), 
-                new FileSystem(logger), 
-                new DatabaseScriptsExecutor(logger));
+                logger,
+                new ZipArchiver(),
+                new FileSystem(logger),
+                new DatabaseConnectorFactory(logger, new Configuration() { ConnectionString = connectionString, DatabaseName = databaseName }),
+                new PackageReader());
         }
 
         private static void PrintUsage(ILogger logger)

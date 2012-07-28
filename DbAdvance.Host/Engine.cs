@@ -1,86 +1,113 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 using DbAdvance.Host.Archiver;
-using DbAdvance.Host.ScriptScanner;
+using DbAdvance.Host.Package;
 
 namespace DbAdvance.Host
 {
     public class Engine
     {
         private readonly ILogger log;
+
         private readonly ZipArchiver zipArchiver;
+
         private readonly IFileSystem fileSystem;
-        private readonly DatabaseScriptsExecutor databaseScriptsExecutor;
+
+        private readonly DatabaseConnectorFactory databaseConnectorFactory;
+
+        private readonly PackageReader scriptsScanner;
 
         public Engine(
-            ILogger log, 
-            ZipArchiver zipArchiver, 
-            IFileSystem fileSystem, 
-            DatabaseScriptsExecutor databaseScriptsExecutor)
+            ILogger log,
+            ZipArchiver zipArchiver,
+            IFileSystem fileSystem,
+            DatabaseConnectorFactory databaseConnectorFactory,
+            PackageReader scriptsScanner)
         {
             this.log = log;
             this.zipArchiver = zipArchiver;
             this.fileSystem = fileSystem;
-            this.databaseScriptsExecutor = databaseScriptsExecutor;
+            this.databaseConnectorFactory = databaseConnectorFactory;
+            this.scriptsScanner = scriptsScanner;
         }
 
-        public void CommitFromVersion(string packagePath, string version, string connectionString, string databaseName)
+        public void RollbackAndCommit(string rollbackPath, string commitPath)
         {
-            log.Log("Apply package {0} from version {1} on server {2} ...", packagePath, version, connectionString);
+            Rollback(commitPath);
 
-            Deploy(packagePath, new FromVersionDatabaseScriptsScanner(), connectionString, true, version, databaseName);
+            Commit(commitPath);
         }
 
-        public void RollbackToVersion(string packagePath, string version, string connectionString, string databaseName)
+        public void Commit(string packagePath)
         {
-            log.Log("Rollback package {0} to version {1} on server {2} ...", packagePath, version, connectionString);
+            var package = GetPackage(packagePath);
 
-            Deploy(packagePath, new FromVersionDatabaseScriptsScanner(), connectionString, false, version, databaseName);
+            using (var connector = databaseConnectorFactory.Create())
+            {
+                connector.Open();
+
+                var databaseVersion = connector.GetDatabaseVersion();
+
+                GetFrom(package)
+                    .Zip(package, (fromVersion, toObject) => new Step { FromVersion = fromVersion, ToVersion = toObject.Version, Scripts = toObject.CommitScripts })
+                    .OrderBy(d => d.FromVersion)
+                    .SkipWhile(d => d.FromVersion != databaseVersion)
+                    .ToList()
+                    .ForEach(connector.Apply);
+            }
         }
 
-        private void Deploy(string packagePath, IDatabaseScriptsScanner scriptsScanner, string connectionString, bool isCommit, string version, string databaseName)
+        public void Rollback(string packagePath)
+        {
+            var package = GetPackage(packagePath);
+
+            using (var connector = databaseConnectorFactory.Create())
+            {
+                connector.Open();
+
+                var baseVersion = connector.GetBaseDatabaseVersion();
+
+                GetFrom(package)
+                    .Zip(package, (fromVersion, toObject) => new Step { FromVersion = toObject.Version, ToVersion = fromVersion, Scripts = toObject.RollbackScripts })
+                    .OrderBy(d => d.ToVersion)
+                    .SkipWhile(d => d.ToVersion != baseVersion)
+                    .Reverse()
+                    .ToList()
+                    .ForEach(connector.Apply);
+            }
+        }
+
+        public void ReportVersions()
+        {
+            using (var connector = databaseConnectorFactory.Create())
+            {
+                connector.Open();
+
+                var databaseVersion = connector.GetDatabaseVersion();
+                var baseVersion = connector.GetBaseDatabaseVersion();
+
+                log.Log("Database version is '{0}'", databaseVersion);
+                log.Log("Base version is '{0}'", baseVersion);
+            }
+        }
+
+        private IEnumerable<IDelta> GetPackage(string packagePath)
         {
             var tempPath = Path.Combine(Path.GetTempPath(), "DbAdvanceNet");
 
             fileSystem.CreateFolder(tempPath);
             fileSystem.DeleteFolderContents(tempPath);
+            zipArchiver.Unzip(packagePath, tempPath);
 
-            zipArchiver.Unzip(
-                packagePath,
-                tempPath);
-
-            Run(
-                tempPath,
-                scriptsScanner,
-                connectionString,
-                isCommit,
-                version,
-                databaseName);
+            return scriptsScanner.GetDeltas(tempPath);
         }
 
-        private void Run(string packageRootPath, IDatabaseScriptsScanner scanner, string connectionString, bool isCommit, string fromVersion, string databaseName)
+        private static IEnumerable<string> GetFrom(IEnumerable<IDelta> deltas)
         {
-            if (isCommit)
-            {
-                scanner
-                    .GetScripts(packageRootPath)
-                    .OrderBy(d => d.FromVersion)
-                    .SkipWhile(d => d.FromVersion != fromVersion)
-                    .ToList()
-                    .ForEach(d => databaseScriptsExecutor.ApplyDelta(databaseName, connectionString, d.FromVersion, d.ToVersion, d.CommitScripts));
-            }
-            else
-            {
-                scanner
-                    .GetScripts(packageRootPath)
-                    .OrderBy(d => d.FromVersion)
-                    .SkipWhile(d => d.FromVersion != fromVersion)
-                    .Reverse()
-                    .ToList()
-                    .ForEach(d => databaseScriptsExecutor.ApplyDelta(databaseName, connectionString, d.ToVersion, d.FromVersion, d.RollbackScripts));
-            }
+            return deltas.Select(d => d.Version).Reverse().Skip(1).Union(new[] { (string)null }).Reverse();
         }
     }
 }

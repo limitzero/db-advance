@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 
+using DbAdvance.Host.Package;
+
 namespace DbAdvance.Host
 {
-    public class DatabaseScriptVersion
+    public class Step
     {
         public string FromVersion { get; set; }
 
         public string ToVersion { get; set; }
 
-        public IEnumerable<string> CommitScripts { get; set; }
-
-        public IEnumerable<string> RollbackScripts { get; set; }
+        public IEnumerable<ScriptAccessor> Scripts { get; set; }
     }
 }

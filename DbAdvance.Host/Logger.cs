@@ -6,7 +6,7 @@ namespace DbAdvance.Host
     {
         public void Log(string message, params object[] parameters)
         {
-            Console.WriteLine("<" + DateTime.Now.ToLongTimeString() + "> " + string.Format(message, parameters));
+            Console.WriteLine("[" + DateTime.Now.ToLongTimeString() + "] " + string.Format(message, parameters));
         }
     }
 }
