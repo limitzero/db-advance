@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using DbAdvance.Host.Archiver;
 using DbAdvance.Host.Package;
@@ -19,37 +20,90 @@ namespace DbAdvance.Host
 
             var engine = GetEngine(logger, connectionString, databaseName);
 
+            engine.ReportVersions();
             
             switch (command)
             {
                 case "-c":
-                    if (CheckParameters(args, logger, 4)) return;
+                    if (CheckParameters(args, logger, 4)) throw new Exception();
 
-                    engine.ReportVersions();
-                    engine.Commit(args[3]);
+                    try
+                    {
+                        engine.Commit(args[3]);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(e.Message);
+                        throw;
+                    }
+                    
+                    break;
+                        
+                case "-cv":
+                    if (CheckParameters(args, logger, 5)) throw new Exception();
+
+                    try
+                    {
+                        engine.CommitVersion(args[3], args[4]);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(e.Message);
+                        throw;
+                    }
 
                     break;
 
                 case "-r":
-                    if (CheckParameters(args, logger, 4)) return;
+                    if (CheckParameters(args, logger, 4)) throw new Exception();
 
-                    engine.ReportVersions();
-                    engine.Rollback(args[3]);
+                    try
+                    {
+                        engine.Rollback(args[3]);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(e.Message);
+                        throw;
+                    }
+
+                    break;
+
+
+                case "-rv":
+                    if (CheckParameters(args, logger, 4)) throw new Exception();
+
+                    try
+                    {
+                        engine.RollbackVersion(args[3], args[4]);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(e.Message);
+                        throw;
+                    }
 
                     break;
 
                 case "-rc":
-                    if (CheckParameters(args, logger, 5)) return;
+                    if (CheckParameters(args, logger, 5)) throw new Exception();
 
-                    engine.ReportVersions();
-                    engine.RollbackAndCommit(args[3], args[4]);
+                    try
+                    {
+                        engine.RollbackAndCommit(args[3], args[4]);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(e.Message);
+                        throw;
+                    }
 
                     break;
 
                 default:
                     logger.Log("Unknown command: {0}", command);
                     PrintUsage(logger);
-                    break;
+                    throw new Exception();
             }
 
         }
@@ -76,8 +130,7 @@ namespace DbAdvance.Host
 
         private static void PrintUsage(ILogger logger)
         {
-            logger.Log("Db Advance:");
-            logger.Log("assembly and class name.");
+            logger.Log("Db Advance. Incorrect Parameters.");
         }
     }
 }

@@ -60,6 +60,33 @@ namespace DbAdvance.Host
             }
         }
 
+        public void CommitVersion(string packagePath, string version)
+        {
+            if (string.IsNullOrEmpty(version) || int.Parse(version) == 0)
+            {
+                version = null;
+            }
+
+            var package = GetPackage(packagePath);
+
+            CheckVersion(version, package);
+
+            using (var connector = databaseConnectorFactory.Create())
+            {
+                connector.Open();
+
+                var databaseVersion = connector.GetDatabaseVersion();
+
+                GetFrom(package)
+                    .Zip(package, (fromVersion, toObject) => new Step { FromVersion = fromVersion, ToVersion = toObject.Version, Scripts = toObject.CommitScripts })
+                    .OrderBy(d => d.FromVersion)
+                    .SkipWhile(d => d.FromVersion != databaseVersion)
+                    .TakeWhile(d => d.ToVersion.CompareTo(version) <= 0)
+                    .ToList()
+                    .ForEach(connector.Apply);
+            }
+        }
+
         public void Rollback(string packagePath)
         {
             var package = GetPackage(packagePath);
@@ -77,6 +104,47 @@ namespace DbAdvance.Host
                     .Reverse()
                     .ToList()
                     .ForEach(connector.Apply);
+            }
+        }
+
+        public void RollbackVersion(string packagePath, string version)
+        {
+            if (string.IsNullOrEmpty(version) || int.Parse(version) == 0)
+            {
+                version = null;
+            }
+
+            var package = GetPackage(packagePath);
+
+            CheckVersion(version, package);
+
+            using (var connector = databaseConnectorFactory.Create())
+            {
+                connector.Open();
+
+                var databaseVersion = connector.GetDatabaseVersion();
+
+                GetFrom(package)
+                    .Zip(package, (fromVersion, toObject) => new Step { FromVersion = toObject.Version, ToVersion = fromVersion, Scripts = toObject.RollbackScripts })
+                    .OrderBy(d => d.ToVersion)
+                    .SkipWhile(d => d.ToVersion != version)
+                    .TakeWhile(d => d.FromVersion.CompareTo(databaseVersion) <= 0)
+                    .Reverse()
+                    .ToList()
+                    .ForEach(connector.Apply);
+            }
+        }
+
+        private static void CheckVersion(string version, IEnumerable<IDelta> package)
+        {
+            if (version == null)
+            {
+                return;
+            }
+
+            if (package.All(p => p.Version != version))
+            {
+                throw new Exception(string.Format("Package doesn't contain version {0}", version));
             }
         }
 
