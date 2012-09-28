@@ -13,14 +13,6 @@ namespace DbAdvance.Host
         {
             var logger = new Logger();
 
-            args = new[]
-                {
-                    "-c",
-                    "Data Source=ci.tfn.com;User Id=sa; Password=Password123;",
-                    "BetaIntegration2",
-                    @"d:\rel\build.zip"
-                };
-
             if (CheckParameters(args, logger, 3)) return;
 
             var command = args[0];
