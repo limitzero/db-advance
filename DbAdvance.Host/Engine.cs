@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using DbAdvance.Host.Archiver;
+using DbAdvance.Host.DbConnectors;
 using DbAdvance.Host.Package;
 
 namespace DbAdvance.Host
@@ -159,6 +160,16 @@ namespace DbAdvance.Host
 
                 log.Log("Database version is '{0}'", databaseVersion);
                 log.Log("Base version is '{0}'", baseVersion);
+            }
+        }
+
+        public void SetBaseDatabaseVersion(string version)
+        {
+            using (var connector = databaseConnectorFactory.Create())
+            {
+                connector.Open();
+
+                connector.SetBaseDatabaseVersion(version);
             }
         }
 

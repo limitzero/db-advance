@@ -19,6 +19,11 @@ namespace DbAdvance.Host.Package
             }
         }
 
+        public string GetFullPath()
+        {
+            return Path.GetFullPath(scriptPath);
+        }
+
         public override string ToString()
         {
             return Path.GetFileName(scriptPath);

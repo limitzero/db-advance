@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using DbAdvance.Host.Archiver;
+using DbAdvance.Host.DbConnectors;
 using DbAdvance.Host.Package;
 
 namespace DbAdvance.Host
@@ -11,6 +12,14 @@ namespace DbAdvance.Host
         public static void Main(string[] args)
         {
             var logger = new Logger();
+
+            args = new[]
+                {
+                    "-c",
+                    "Data Source=ci.tfn.com;User Id=sa; Password=Password123;",
+                    "BetaIntegration2",
+                    @"d:\rel\build.zip"
+                };
 
             if (CheckParameters(args, logger, 3)) return;
 
@@ -24,6 +33,21 @@ namespace DbAdvance.Host
             
             switch (command)
             {
+                case "-sbv":
+                    if (CheckParameters(args, logger, 4)) throw new Exception();
+
+                    try
+                    {
+                        engine.SetBaseDatabaseVersion(args[3]);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Log(e.Message);
+                        throw;
+                    }
+
+                    break;
+
                 case "-c":
                     if (CheckParameters(args, logger, 4)) throw new Exception();
 
@@ -113,6 +137,8 @@ namespace DbAdvance.Host
             if (args.Count < number)
             {
                 PrintUsage(logger);
+
+                return true;
             }
 
             return false;

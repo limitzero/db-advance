@@ -34,11 +34,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,13 +48,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
-    <Compile Include="DatabaseConnector.cs" />
-    <Compile Include="DatabaseConnectorFactory.cs" />
+    <Compile Include="DbConnectors\BaseDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\DefaultDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\DatabaseConnectorFactory.cs" />
+    <Compile Include="DbConnectors\IDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\SqlCmdDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\SqlCmdRunner.cs" />
     <Compile Include="Step.cs" />
     <Compile Include="Package\Delta.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="FileSystem.cs" />
-    <Compile Include="IDatabaseConnectorConfiguration.cs" />
+    <Compile Include="DbConnectors\IDatabaseConnectorConfiguration.cs" />
     <Compile Include="IFileSystem.cs" />
     <Compile Include="Package\IDelta.cs" />
     <Compile Include="Package\PackageReader.cs" />
@@ -67,6 +71,7 @@
     <Compile Include="Package\ScriptAccessor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
