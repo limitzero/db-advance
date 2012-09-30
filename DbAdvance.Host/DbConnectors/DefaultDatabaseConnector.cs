@@ -28,7 +28,7 @@ namespace DbAdvance.Host.DbConnectors
 
                 foreach (var script in step.Scripts)
                 {
-                    ExecuteScript(currentConnection, script);
+                    ExecuteScript(script);
                 }
 
                 if (!DatabaseExist(config.DatabaseName) && step.ToVersion != null)
@@ -49,28 +49,32 @@ namespace DbAdvance.Host.DbConnectors
             }
         }
 
-        private void ExecuteScript(SqlConnection connection, ScriptAccessor scriptAccessor)
+        private void ExecuteScript(ScriptAccessor scriptAccessor)
         {
-            log.Log("<script name='{0}'>", scriptAccessor.ToString());
-
-            connection.InfoMessage += InfoMessage;
-
-            try
+            using (var connection = new SqlConnection(config.ConnectionString))
             {
-                var script = scriptAccessor.Read();
+                connection.Open();
 
-                var commands = Regex.Split(script, @"(?m)^\s*GO\s*\d*\s*$", RegexOptions.IgnoreCase);
+                log.Log("<script name='{0}'>", scriptAccessor.ToString());
 
-                foreach (var c in commands.Where(q => !string.IsNullOrEmpty(q)))
+                connection.InfoMessage += InfoMessage;
+
+                try
                 {
-                    new SqlCommand(c, connection)
-                        .ExecuteNonQuery();
+                    var script = scriptAccessor.Read();
+
+                    var commands = Regex.Split(script, @"(?m)^\s*GO\s*\d*\s*$", RegexOptions.IgnoreCase);
+
+                    foreach (var c in commands.Where(q => !string.IsNullOrEmpty(q)))
+                    {
+                        new SqlCommand(c, connection).ExecuteNonQuery();
+                    }
                 }
-            }
-            finally
-            {
-                connection.InfoMessage -= InfoMessage;
-                log.Log("<script/>");
+                finally
+                {
+                    connection.InfoMessage -= InfoMessage;
+                    log.Log("<script/>");
+                }
             }
         }
 

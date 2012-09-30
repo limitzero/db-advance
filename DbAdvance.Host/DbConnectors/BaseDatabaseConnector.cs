@@ -4,12 +4,10 @@ using System.Data.SqlClient;
 
 namespace DbAdvance.Host.DbConnectors
 {
-    public abstract class BaseDatabaseConnector : IDisposable, IDatabaseConnector
+    public abstract class BaseDatabaseConnector : IDatabaseConnector
     {
         protected readonly ILogger log;
         protected readonly IDatabaseConnectorConfiguration config;
-
-        protected SqlConnection currentConnection;
 
         protected BaseDatabaseConnector(ILogger log, IDatabaseConnectorConfiguration config)
         {
@@ -18,12 +16,6 @@ namespace DbAdvance.Host.DbConnectors
         }
 
         public abstract void Apply(Step step);
-
-        public void Open()
-        {
-            currentConnection = new SqlConnection(config.ConnectionString);
-            currentConnection.Open();
-        }
 
         public string GetDatabaseVersion()
         {
@@ -53,17 +45,12 @@ namespace DbAdvance.Host.DbConnectors
         {
             SetVersion(VersionType.BaseVersion, version);
         }
-
-        public void Dispose()
-        {
-            currentConnection.Dispose();
-        }
-
+        
         protected void SetVersion(VersionType parameterName, string version)
         {
             if (!DatabaseExist(config.DatabaseName)) { return; }
 
-            if (GetVersion(parameterName, config.DatabaseName) == null)
+            if (VersionMissing(parameterName, config.DatabaseName))
             {
                 AddVersion(parameterName, config.DatabaseName, version);
             }
@@ -75,69 +62,101 @@ namespace DbAdvance.Host.DbConnectors
 
         protected bool DatabaseExist(string databaseName)
         {
-            const string Sql = @"IF (EXISTS (SELECT name 
+            using (var currentConnection = new SqlConnection(config.ConnectionString))
+            {
+                currentConnection.Open();
+
+                const string Sql = @"IF (EXISTS (SELECT name 
                 FROM master.dbo.sysdatabases 
                 WHERE ('[' + name + ']' = @databaseName 
                 OR name = @databaseName))) SELECT CAST(1 AS bit) ELSE SELECT CAST(0 AS bit);";
 
-            var command = new SqlCommand(Sql, currentConnection)
-                {
-                    CommandType = CommandType.Text
-                };
+                var command = new SqlCommand(Sql, currentConnection) { CommandType = CommandType.Text };
 
-            command.Parameters.Add(new SqlParameter("databaseName", databaseName));
+                command.Parameters.Add(new SqlParameter("databaseName", databaseName));
 
-            return (bool)command.ExecuteScalar();
+                return (bool)command.ExecuteScalar();
+            }
         }
 
         private void AddVersion(VersionType versionType, string databaseName, string version)
         {
-            UseDatabase(currentConnection, databaseName);
+            using (var currentConnection = new SqlConnection(config.ConnectionString))
+            {
+                currentConnection.Open();
 
-            var command = new SqlCommand(@"sys.sp_addextendedproperty", currentConnection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
+                UseDatabase(currentConnection, databaseName);
 
-            command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
-            command.Parameters.Add(new SqlParameter("value", version ?? string.Empty));
+                var command = new SqlCommand(@"sys.sp_addextendedproperty", currentConnection)
+                    { CommandType = CommandType.StoredProcedure };
 
-            command.ExecuteNonQuery();
+                command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
+                command.Parameters.Add(new SqlParameter("value", version ?? string.Empty));
+
+                command.ExecuteNonQuery();
+            }
         }
 
         private void UpdateVersion(VersionType versionType, string databaseName, string version)
         {
-            UseDatabase(currentConnection, databaseName);
-
-            var command = new SqlCommand(@"sys.sp_updateextendedproperty", currentConnection)
+            using (var currentConnection = new SqlConnection(config.ConnectionString))
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                currentConnection.Open();
 
-            command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
-            command.Parameters.Add(new SqlParameter("value", version ?? string.Empty));
+                UseDatabase(currentConnection, databaseName);
 
-            command.ExecuteNonQuery();
+                var command = new SqlCommand(@"sys.sp_updateextendedproperty", currentConnection)
+                    { CommandType = CommandType.StoredProcedure };
+
+                command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
+                command.Parameters.Add(new SqlParameter("value", version ?? string.Empty));
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private bool VersionMissing(VersionType versionType, string databaseName)
+        {
+            using (var currentConnection = new SqlConnection(config.ConnectionString))
+            {
+                currentConnection.Open();
+
+                UseDatabase(currentConnection, databaseName);
+
+                const string Sql = @"SELECT CAST(Value AS nvarchar(500))
+                FROM sys.extended_properties AS ep
+                WHERE ep.name = @name;";
+
+                var command = new SqlCommand(Sql, currentConnection) { CommandType = CommandType.Text };
+
+                command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
+
+                var version = (string)command.ExecuteScalar();
+
+                return version == null;
+            }
         }
 
         private string GetVersion(VersionType versionType, string databaseName)
         {
-            UseDatabase(currentConnection, databaseName);
+            using (var currentConnection = new SqlConnection(config.ConnectionString))
+            {
+                currentConnection.Open();
 
-            const string Sql = @"SELECT CAST(Value AS nvarchar(500))
+                UseDatabase(currentConnection, databaseName);
+
+                const string Sql = @"SELECT CAST(Value AS nvarchar(500))
                 FROM sys.extended_properties AS ep
                 WHERE ep.name = @name;";
 
-            var command = new SqlCommand(Sql, currentConnection)
-                {
-                    CommandType = CommandType.Text
-                };
+                var command = new SqlCommand(Sql, currentConnection) { CommandType = CommandType.Text };
 
-            command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
+                command.Parameters.Add(new SqlParameter("name", GetName(versionType)));
 
-            var version = (string)command.ExecuteScalar();
+                var version = (string)command.ExecuteScalar();
 
-            return string.IsNullOrEmpty(version) ? null : version;
+                return string.IsNullOrEmpty(version) ? null : version;
+            }
         }
 
         private static string GetName(VersionType versionType)

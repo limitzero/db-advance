@@ -31,7 +31,14 @@ namespace DbAdvance.Host.DbConnectors
 
                 foreach (var script in step.Scripts)
                 {
-                    ExecuteScript(script);
+                    if (DatabaseExist(config.DatabaseName))
+                    {
+                        ExecuteScript(script);
+                    }
+                    else
+                    {
+                        ExecuteScriptOnMaster(script);
+                    }
                 }
 
                 if (!DatabaseExist(config.DatabaseName) && step.ToVersion != null)
@@ -52,7 +59,7 @@ namespace DbAdvance.Host.DbConnectors
             }
         }
 
-        private void ExecuteScript(ScriptAccessor scriptAccessor)
+        private void ExecuteScriptOnMaster(ScriptAccessor scriptAccessor)
         {
             log.Log("<script name='{0}'>", scriptAccessor.ToString());
 
@@ -63,6 +70,25 @@ namespace DbAdvance.Host.DbConnectors
                     сonnectionStringBuilder.UserID,
                     сonnectionStringBuilder.Password,
                     scriptAccessor.GetFullPath());
+            }
+            finally
+            {
+                log.Log("<script/>");
+            }
+        }
+
+        private void ExecuteScript(ScriptAccessor scriptAccessor)
+        {
+            log.Log("<script name='{0}'>", scriptAccessor.ToString());
+
+            try
+            {
+                runner.Run(
+                    сonnectionStringBuilder.DataSource,
+                    сonnectionStringBuilder.UserID,
+                    сonnectionStringBuilder.Password,
+                    scriptAccessor.GetFullPath(),
+                    config.DatabaseName);
             }
             finally
             {

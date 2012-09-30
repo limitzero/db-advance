@@ -9,16 +9,15 @@ namespace DbAdvance.Host.DbConnectors
         private readonly ILogger log;
 
         private const string SqlCmdExe = "sqlcmd.exe";
-        private const string SqlCmdParameters = "-S {0} -U {1} -P {2} -i \"{3}\"";
 
         public SqlCmdRunner(ILogger log)
         {
             this.log = log;
         }
 
-        public void Run(string server, string username, string password, string script)
+        public void Run(string server, string username, string password, string script, string databaseName = null)
         {
-            var processStartInfo = GetProcessStartInfo(server, username, password, script);
+            var processStartInfo = GetProcessStartInfo(server, username, password, script, databaseName);
 
             using (var proc = new Process { StartInfo = processStartInfo })
             {
@@ -28,7 +27,7 @@ namespace DbAdvance.Host.DbConnectors
 
                 if (output != string.Empty)
                 {
-                    log.Log("Exec Output -----------------------------------------------------------------------------------------");
+                    log.Log("-----------------------------------------------------------------------------------------------------");
                     log.Log(output);
                     log.Log("-----------------------------------------------------------------------------------------------------");
                 }
@@ -43,17 +42,20 @@ namespace DbAdvance.Host.DbConnectors
             }
         }
 
-        private static ProcessStartInfo GetProcessStartInfo(string server, string username, string password, string script)
+        private static ProcessStartInfo GetProcessStartInfo(string server, string username, string password, string script, string databaseName)
         {
-           return new ProcessStartInfo(
+            var command = string.IsNullOrEmpty(username)
+                ? string.Format(CultureInfo.InvariantCulture, "-S {0} -i \"{1}\"", server, script)
+                : string.Format(CultureInfo.InvariantCulture, "-S {0} -U {1} -P {2} -i \"{3}\"", server, username, password, script);
+
+            if (databaseName != null)
+            {
+                command += string.Format(" -d {0}", databaseName);
+            }
+
+            return new ProcessStartInfo(
                 SqlCmdExe,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    SqlCmdParameters,
-                    server,
-                    username,
-                    password,
-                    script))
+                command)
                 {
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

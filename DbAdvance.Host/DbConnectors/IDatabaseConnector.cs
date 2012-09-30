@@ -1,12 +1,8 @@
-using System;
-
 namespace DbAdvance.Host.DbConnectors
 {
-    public interface IDatabaseConnector : IDisposable
+    public interface IDatabaseConnector
     {
         void Apply(Step step);
-
-        void Open();
 
         string GetDatabaseVersion();
 
