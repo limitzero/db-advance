@@ -3,7 +3,7 @@ This project is currently forked from [db-advance](https://github.com/slmoloch/d
 
 db-advance is a tool to deploy changes to a SQL Server database. db-advance works with a package that is a simple zip file with the contents of the following structure.
 
-(https://github.com/limitzero/db-advance/blob/master/imgs/directory_structure.jpg)
+![logo](imgs/directory_structure.jpg)
 
 
 
