@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{56CFD436-1ED7-464A-BAC5-DF86E7169E6E}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DbAdvance.Host</RootNamespace>
+    <AssemblyName>db-advance</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\..\packages\Castle.Core.3.3.3\lib\net40-client\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Facilities.Logging">
+      <HintPath>..\..\packages\Castle.LoggingFacility.3.3.0\lib\net40\Castle.Facilities.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Services.Logging.NLogIntegration">
+      <HintPath>..\..\packages\Castle.Core-NLog.3.3.3\lib\net40-client\Castle.Services.Logging.NLogIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\..\packages\Castle.Windsor.3.3.0\lib\net40\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper">
+      <HintPath>..\..\packages\Dapper.1.42\lib\net40\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper.Contrib">
+      <HintPath>..\..\packages\Dapper.Contrib.1.43\lib\net40\Dapper.Contrib.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\..\packages\NLog.4.2.3\lib\net40\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Commands\Commit\Pipeline\CommitPipeline.cs" />
+    <Compile Include="Commands\Commit\CommitPipelineFactory.cs" />
+    <Compile Include="Commands\Deploy\DeployPipelineFactory.cs" />
+    <Compile Include="Commands\Deploy\Pipeline\DeployPipeline.cs" />
+    <Compile Include="Commands\Deploy\Pipeline\Steps\CreateDeployDirectoryStep.cs" />
+    <Compile Include="Commands\Deploy\Pipeline\Steps\DeployPackageStep.cs" />
+    <Compile Include="Commands\Deploy\Pipeline\Steps\ValidateDeployCommandStep.cs" />
+    <Compile Include="Commands\Init\InitializePipelineFactory.cs" />
+    <Compile Include="Commands\Init\Pipeline\InitializePipeline.cs" />
+    <Compile Include="Commands\Init\Pipeline\Steps\ConstructScriptFoldersOnPathStep.cs" />
+    <Compile Include="Commands\MutateTargetDatabasePipeline.cs" />
+    <Compile Include="Commands\Pack\PackagePipelineFactory.cs" />
+    <Compile Include="Commands\Pack\Pipeline\PackagePipeline.cs" />
+    <Compile Include="Commands\Pack\Pipeline\Steps\CreateZipArchiveForScriptPathStep.cs" />
+    <Compile Include="Commands\Pack\Pipeline\Steps\ValidateDeployCommandStep.cs" />
+    <Compile Include="Commands\Rebuild\Pipeline\RebuildPipeline.cs" />
+    <Compile Include="Commands\Rebuild\Pipeline\Steps\BuildInfoTablesStep.cs" />
+    <Compile Include="Commands\Rebuild\Pipeline\Steps\DropDatabaseStep.cs" />
+    <Compile Include="Commands\Rebuild\Pipeline\Steps\InvokeUpgradeStep.cs" />
+    <Compile Include="Commands\Rebuild\RebuildPipelineFactory.cs" />
+    <Compile Include="Commands\Rollback\Pipeline\RollbackPipeline.cs" />
+    <Compile Include="Commands\Rollback\Pipeline\Steps\GetVersionsWithTagStep.cs" />
+    <Compile Include="Commands\Rollback\Pipeline\Steps\RemoveRolledBackVersionInformationStep.cs" />
+    <Compile Include="Commands\Rollback\RollbackPipelineFactory.cs" />
+    <Compile Include="Commands\Setup\Pipeline\Steps\CreateSchemaTablesStep.cs" />
+    <Compile Include="Commands\Steps\FolderRunStrategy\DownFolderScriptsRunSpecification.cs" />
+    <Compile Include="Commands\Steps\FolderRunStrategy\IRunScriptsForFolder.cs" />
+    <Compile Include="Commands\Steps\FolderRunStrategy\RunAfterAllFolderScriptsRunSpecification.cs" />
+    <Compile Include="Commands\Steps\FolderRunStrategy\RunBeforeAllFolderScriptsRunSpecification.cs" />
+    <Compile Include="Commands\Steps\FolderRunStrategy\RunOneTimeFolderScriptsRunSpecification.cs" />
+    <Compile Include="Commands\Steps\FolderRunStrategy\UpFolderScriptsRunSpecification.cs" />
+    <Compile Include="Commands\Setup\Pipeline\Steps\InspectSchemaStep.cs" />
+    <Compile Include="Commands\Steps\GetOrSetVersionStep.cs" />
+    <Compile Include="Commands\CommandPipelineContext.cs" />
+    <Compile Include="Commands\CommandPipelineFactoryConnector.cs" />
+    <Compile Include="Commands\Setup\Pipeline\SetupDatabasePipeline.cs" />
+    <Compile Include="Commands\Setup\SetupDatabasePipelineFactory.cs" />
+    <Compile Include="Commands\Steps\ApplyScriptsStep.cs" />
+    <Compile Include="Commands\Steps\ReportPreUpgradeInformationStep.cs" />
+    <Compile Include="Commands\Steps\ReportPostUpgradeInformationStep.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\BaseVersionDatabaseSpecification.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\ExternalVersionNumberNotSuppliedAndNoVersionInfoHistorySpecification.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\ExternalVersionNumberNotSuppliedWithVersionInfoHistorySpecification.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\ExternalVersionNumberSameAsMaxVersionInfoHistorySpecification.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\ExternalVersionNumberSuppliedWithoutVersionInfoHistorySpecification.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\ExternalVersionNumberSuppliedWithVersionInfoHistorySpecification.cs" />
+    <Compile Include="Commands\Steps\VersioningStrategy\IVersionDatabaseSpecification.cs" />
+    <Compile Include="Commands\Steps\VersionAllScriptsForRunStep.cs" />
+    <Compile Include="DatabaseConnectorConfiguration.cs" />
+    <Compile Include="DbAdvanceCommandLineOptions.cs" />
+    <Compile Include="DbAdvanceInstaller.cs" />
+    <Compile Include="DbAdvanceRunner.cs" />
+    <Compile Include="DbConnectors\BaseDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\DefaultDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\DatabaseConnectorFactory.cs" />
+    <Compile Include="DbConnectors\BasicDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\IDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\ScriptRunResult.cs" />
+    <Compile Include="DbConnectors\SqlCmdDatabaseConnector.cs" />
+    <Compile Include="DbConnectors\SqlCmdRunner.cs" />
+    <Compile Include="FolderStructure.cs" />
+    <Compile Include="LoggerExtensions.cs" />
+    <Compile Include="Models\Entities\ScriptsRunDeployInfo.cs" />
+    <Compile Include="Models\Queries\GetAllPendingScriptsQuery.cs" />
+    <Compile Include="Models\IQuery.cs" />
+    <Compile Include="Models\Entities\ScriptRunErrorInfo.cs" />
+    <Compile Include="Models\Entities\ScriptsRunInfo.cs" />
+    <Compile Include="Models\Entities\VersionInfo.cs" />
+    <Compile Include="Models\QueryObjectExecutor.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="Package\ChangeDetection\DownScriptFolder.cs" />
+    <Compile Include="Package\ChangeDetection\BaseScriptFolder.cs" />
+    <Compile Include="Package\ChangeDetection\RunAfterAllScriptFolder.cs" />
+    <Compile Include="Package\ChangeDetection\RunBeforeAllScriptFolder.cs" />
+    <Compile Include="Package\ChangeDetection\RunOneTimeScriptFolder.cs" />
+    <Compile Include="Package\ChangeDetection\UpScriptFolder.cs" />
+    <Compile Include="Pipeline\BasePipeline.cs" />
+    <Compile Include="Pipeline\BasePipelineFactory.cs" />
+    <Compile Include="Pipeline\BasePipelineStep.cs" />
+    <Compile Include="Pipeline\IPipelineFactory.cs" />
+    <Compile Include="Pipeline\PipelineContext.cs" />
+    <Compile Include="Pipeline\IPipeline.cs" />
+    <Compile Include="Pipeline\IPipelineStep.cs" />
+    <Compile Include="Step.cs" />
+    <Compile Include="Package\Delta.cs" />
+    <Compile Include="FileSystem.cs" />
+    <Compile Include="DbConnectors\IDatabaseConnectorConfiguration.cs" />
+    <Compile Include="IFileSystem.cs" />
+    <Compile Include="Package\IDelta.cs" />
+    <Compile Include="Package\PackageReader.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Archiver\ZipArchiver.cs" />
+    <Compile Include="Archiver\ZipItem.cs" />
+    <Compile Include="Package\ScriptAccessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\Commit\Pipeline\Steps\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
