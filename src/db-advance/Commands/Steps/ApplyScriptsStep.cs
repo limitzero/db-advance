@@ -4,11 +4,8 @@ using System.IO;
 using System.Linq;
 using Castle.MicroKernel;
 using Dapper.Contrib.Extensions;
-using DbAdvance.Host.Commands.Steps.FolderRunStrategy;
 using DbAdvance.Host.DbConnectors;
-using DbAdvance.Host.Models;
 using DbAdvance.Host.Models.Entities;
-using DbAdvance.Host.Package;
 using DbAdvance.Host.Pipeline;
 
 namespace DbAdvance.Host.Commands.Steps
@@ -21,8 +18,6 @@ namespace DbAdvance.Host.Commands.Steps
 
         public Action<ScriptsRunInfo> OnScriptInfoRecorded;
         public Action<ScriptsRunErrorInfo> OnScriptInfoErrorRecorded;
-
-        public bool UseRollbackScripts { get; set; }
 
         public ApplyScriptsStep(IKernel kernel, DatabaseConnectorFactory factory) : base(kernel)
         {
@@ -87,7 +82,6 @@ namespace DbAdvance.Host.Commands.Steps
                 .Select(r => new ScriptsRunInfo
                 {
                     EntryDate = System.DateTime.Now,
-                    IsRollbackScript = UseRollbackScripts,
                     ScriptName = Path.GetFileName(r.Script.GetFullPath()),
                     ScriptText = r.Script.Read(),
                     Tag = r.Script.Tag ?? string.Empty,

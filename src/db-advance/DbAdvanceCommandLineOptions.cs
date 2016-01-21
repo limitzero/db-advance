@@ -115,14 +115,27 @@ namespace DbAdvance.Host
                     option => { Command = "init"; })
                 .Add("rebuild|refresh|rb",
                     BuildDescription(
-                        "Used to drop and create the target database and apply all scripts against it. Please note that the script and version history will be deleted.",
+                        "Cleans the target database and apply all scripts against it.",
                         string.Empty,
                         "Usage: db-advance.exe --rebuild --database=Northwind --path={your directory for scripts}",
                         string.Empty,
                         "Example:",
                         @"db-advance.exe --rebuild --database=Northwind --path='C:\Databases\Nortwind\Scripts'",
                         string.Empty),
-                    option => { Command = "rebuild"; });
+                    option =>
+                    {
+                        Command = "rebuild";
+                    })
+                .Add("clean",
+                    BuildDescription(
+                        "Used to remove all schema objects in the target database (please note that this also includes the history tables).",
+                        string.Empty,
+                        "Usage: db-advance.exe --clean --database=Northwind",
+                        string.Empty),
+                    option =>
+                    {
+                        Command = "clean";
+                    });
         }
 
         private void BuildSwitches(OptionSet options)

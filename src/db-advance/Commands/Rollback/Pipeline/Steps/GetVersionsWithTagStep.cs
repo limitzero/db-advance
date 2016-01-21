@@ -40,12 +40,12 @@ namespace DbAdvance.Host.Commands.Rollback.Pipeline.Steps
             if (context.Options.VersionsToRollback == 0)
             {
                 Logger.Warn("Specified number of versions to rollback not stated. Aborting...");
-                HaltPipeline = true;
+                Pipeline.Halt = true;
             }
             else if (!versions.Any())
             {
                 Logger.Warn("No version information recorded for rollback. Aborting...");
-                HaltPipeline = true;
+                Pipeline.Halt = true;
             }
 
             if (databaseVersion != null & versions.Any())

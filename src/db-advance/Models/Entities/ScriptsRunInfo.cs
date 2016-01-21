@@ -14,7 +14,6 @@ namespace DbAdvance.Host.Models.Entities
         public long Id { get; set; }
         public string Version { get; set; }
         public string Tag { get; set; }
-        public bool IsRollbackScript { get; set; }
         public long? DeployInfoId { get; set; }
         public string ScriptName { get; set; }
 

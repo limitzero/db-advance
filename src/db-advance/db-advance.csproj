@@ -73,6 +73,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Clean\CleanDatabasePipelineFactory.cs" />
+    <Compile Include="Commands\Clean\Pipeline\CleanDatabasePipeline.cs" />
+    <Compile Include="Commands\Clean\Pipeline\Steps\CleanDatabaseStep.cs" />
     <Compile Include="Commands\Commit\Pipeline\CommitPipeline.cs" />
     <Compile Include="Commands\Commit\CommitPipelineFactory.cs" />
     <Compile Include="Commands\Deploy\DeployPipelineFactory.cs" />
@@ -90,7 +93,6 @@
     <Compile Include="Commands\Pack\Pipeline\Steps\ValidateDeployCommandStep.cs" />
     <Compile Include="Commands\Rebuild\Pipeline\RebuildPipeline.cs" />
     <Compile Include="Commands\Rebuild\Pipeline\Steps\BuildInfoTablesStep.cs" />
-    <Compile Include="Commands\Rebuild\Pipeline\Steps\DropDatabaseStep.cs" />
     <Compile Include="Commands\Rebuild\Pipeline\Steps\InvokeUpgradeStep.cs" />
     <Compile Include="Commands\Rebuild\RebuildPipelineFactory.cs" />
     <Compile Include="Commands\Rollback\Pipeline\RollbackPipeline.cs" />

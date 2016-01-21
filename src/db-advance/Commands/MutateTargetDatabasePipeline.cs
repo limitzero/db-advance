@@ -105,7 +105,6 @@ namespace DbAdvance.Host.Commands
 
         public override void InspectApplyScriptsStepBeforeExecution(ApplyScriptsStep applyScriptsStep)
         {
-            applyScriptsStep.UseRollbackScripts = false;
         }
     }
 
@@ -120,7 +119,6 @@ namespace DbAdvance.Host.Commands
 
         public override void InspectApplyScriptsStepBeforeExecution(ApplyScriptsStep applyScriptsStep)
         {
-            applyScriptsStep.UseRollbackScripts = true;
         }
     }
 

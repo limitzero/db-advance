@@ -57,18 +57,14 @@ namespace DbAdvance.Host
 
         public string GetDatabaseName()
         {
-            using (var connection = GetConnection())
-            {
-                return connection.Database;
-            }
+            var connection = new SqlConnectionStringBuilder(ConnectionString);
+            return connection.InitialCatalog;
         }
 
         public string GetDatabaseServerName()
         {
-            using (var connection = GetConnection())
-            {
-                return connection.DataSource;
-            }
+            var connection = new SqlConnectionStringBuilder(ConnectionString);
+            return connection.DataSource; 
         }
 
         public SqlConnection GetConnection()

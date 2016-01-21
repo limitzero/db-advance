@@ -74,7 +74,6 @@ CREATE TABLE [dbo].[ScriptsRunInfo](
 	[Version] [nvarchar](100) NULL,
     [Tag] [nvarchar](100) NULL,
     [DeployInfoId] bigint NULL,
-    [IsRollbackScript] bit NULL,
 	[ScriptName] [nvarchar](255) NULL,
 	[ScriptText] [text] NULL,
     [ScriptHash] varbinary(max) NULL,
