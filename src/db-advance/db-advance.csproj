@@ -205,7 +205,6 @@
     <EmbeddedResource Include="Usages\Up\Stages\_02_Setup\Steps\versioninfo_create.sql" />
     <None Include="App.config" />
     <EmbeddedResource Include="Usages\_Setup\Pipeline\Steps\schema_info_tables_create.sql" />
-    <Content Include="db-advance-inspection.sql" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
