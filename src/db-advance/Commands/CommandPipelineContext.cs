@@ -7,6 +7,7 @@ using DbAdvance.Host.Models;
 using DbAdvance.Host.Models.Entities;
 using DbAdvance.Host.Package;
 using DbAdvance.Host.Pipeline;
+using DbAdvance.Host.Usages;
 
 namespace DbAdvance.Host.Commands
 {
@@ -36,7 +37,9 @@ namespace DbAdvance.Host.Commands
         /// </summary>
         public string ToVersion { get; set; }
 
-        public DbAdvanceCommandLineOptions Options { get; set; }
+        public DbAdvancedOptions Options { get; set; }
+
+        public HashSet<ScriptAccessor> EnvironmentScriptsFound { get; set; } 
 
         /// <summary>
         /// Gets or sets the set of all changes from a given folder over a script execution run.

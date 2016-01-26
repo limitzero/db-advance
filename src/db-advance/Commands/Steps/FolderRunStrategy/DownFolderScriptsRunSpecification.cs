@@ -16,8 +16,8 @@ namespace DbAdvance.Host.Commands.Steps.FolderRunStrategy
             IDatabaseConnector connector,
             IEnumerable<ScriptAccessor> scripts)
         {
-            if (context.Options.Rollback)
-                base.Execute(context, connector, scripts);
+            //if (context.Options.Rollback)
+            //    base.Execute(context, connector, scripts);
         }
     }
 }

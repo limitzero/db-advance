@@ -15,7 +15,8 @@ namespace DbAdvance.Host.Commands.Rebuild
 
         public RebuildPipelineFactory(IKernel kernel) : base(kernel)
         {
-            Aliases = new[] {"rebuild", "refresh"};
+            Aliases = new string[] { };
+            // Aliases = new[] {"rebuild", "refresh"};
         }
     }
 }

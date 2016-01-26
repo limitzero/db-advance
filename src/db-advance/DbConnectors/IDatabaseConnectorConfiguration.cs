@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using DbAdvance.Host.Usages;
 
 namespace DbAdvance.Host.DbConnectors
 {
@@ -10,7 +11,7 @@ namespace DbAdvance.Host.DbConnectors
 
         string DbConnectorType { get; }
 
-        void Configure(DbAdvanceCommandLineOptions options);
+        void Configure(DbAdvancedOptions options);
         string GetDatabaseName();
         string GetDatabaseServerName();
         SqlConnection GetConnection();

@@ -23,6 +23,8 @@ namespace DbAdvance.Host.Commands.Steps.VersioningStrategy
 
         public override void ExecuteVersioningStrategy(string currentVersion, string desiredVersion)
         {
+            base.Logger.InfoFormat("No version history recorded, using version number from current marker in version information table..");
+
             var version = CreateNewVersion();
             version.Version = version.Id.ToString();
             UpdateVersionInfo(version);

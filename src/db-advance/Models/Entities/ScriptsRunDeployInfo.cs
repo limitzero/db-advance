@@ -9,7 +9,7 @@ namespace DbAdvance.Host.Models.Entities
     {
         [Key]
         public long Id { get; set; }
-
+        public long? VersionInfoId { get; set; }
         public string DeployPackageName { get; set; }
         public byte[] DeployPackageContent { get; set; }
         public DateTime? DeployedOn { get; set; }

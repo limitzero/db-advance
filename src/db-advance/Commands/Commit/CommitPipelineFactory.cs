@@ -16,7 +16,8 @@ namespace DbAdvance.Host.Commands.Commit
 
         public CommitPipelineFactory(IKernel kernel) : base(kernel)
         {
-            Aliases = new List<string> {"up", "commit"};
+            Aliases = new string[] {};
+            // Aliases = new List<string> {"up_1", "commit"};
         }
     }
 }

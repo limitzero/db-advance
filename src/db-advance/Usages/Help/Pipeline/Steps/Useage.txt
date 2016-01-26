@@ -1,0 +1,65 @@
+﻿db-advance.exe [command] [options]
+
+Commands:
+
+--help, --h, ?						= shows this usage
+--drop, --d    						= drops the current database
+--create, --c  						= creates the target database
+--clean								= Drops and re-creates the database
+--up, --u      							= start the migration (forward-only)
+--rebuild, --rb						= Drops and re-creates the target database and begin the migration process via the defined scripts	
+--backup       						= backs up the database to a location
+--restore      						= restores a backed-up copy from a particular location
+--pack									= creates a *.zip file of the scripts for deploy
+--deploy								= unpacks the *.zip file for deployment and runs the "up" command against the target database
+--init, --i								= creates the basice directory structure for the tool at a desired directory (used with option --scriptPath, --sp to designate where to build the folder structure)
+
+Options:
+
+--scriptsPath, --sp				= The directory where the scripts are located for execution against the target database. Defaults to executable path if not specified.
+--database, --db					= Alias to the connection string in the configuration file used to open the target datbase
+--connection, --cn				= If not using configuration file to determine connection to target database, then this option should be used.
+--version, -v						= Specific version to apply to the scripts that are run (defaults to non-deterministic versioning*). Only applicable for --up and --deploy commands.
+--backupDir,--bd				= Directory to store or retreive backups of the target database (used for --restore command as well). If not stated, it will be the current executable directory "\backups".
+--backupFile, --bf 				= The desired name (defaults to "yyymmmdd-hhMMss - full backup-target database name.bak" if not specified) of backup file on backup. For restore, it will use the specified name or revert to most recent if not stated.
+--packageDir, --pd				= Directory that will hold the packaged scripts as a *.zip file for --pack command. Defaults to current executable directory "\packages" if not specified.
+--packageFile, --pf				= Name of the *.zip file that contains the scripts that are packaged for deployment (defaults to db-advance-yyyymmdd-hhMMss.zip if not specified)
+--nowarn 							= Option to stop the tool from warning on changed scripts (i.e. the script will run if it has changed when this option is specificed), otherwise it is skipped.
+--env, --e								= Desired environment for running specific scripts that are formatted as {environment}.filename.env.sql. The value after the option will be used for {environment}
+--wait,--w							= Wait for prompt for continuing after actions are conducted against the target database. 
+
+*Versioning for the scripts on --up,--deploy option are as follows:
+Deterministic:				A value for the --version, --v option is suppled and used to label each set of scripts that are executed against the target database
+Non-Deterministic:	No value is supplied for the version, and the incrementing row number in the versions table is used as the version when all scripts are applied to the target database.
+
+Usages:
+
+-- create the target database on the indicated data server instance (if needed)
+db-advance.exe --create --db=Northwind
+
+-- drop the target database on the indicated data server (if found)
+db-advance.exe --drop --db=Northwind
+
+-- drop and re-create the target database on the indicated data server
+db-advance.exe --clean --db=Northwind
+
+-- start a forward migration of changes to the target database
+db-advance.exe --up --db=Northwind --sp="c:\temp\northwind"
+
+-- backup the current database to a specific directory
+db-advance.exe --backup --db=Northwind --bd="c:\backups\Northwind" --bf="{your *.bak file}"
+
+-- restore a database from a previous backup 
+db-advance.exe --restore --db=Northwind --bd="c:\backups\Northwind" --bf="{your *.bak file}"
+
+-- package the scripts directory into a *.zip file that will be located in a specified directory (--pd) for deployment (with an optional name for the *.zip file as a package name --pn)
+db-advance.exe --pack --db=Northwind --sp="c:\temp\Northwind" --pd="c:\temp\Northwind\packages" --pn="northwind.zip"
+
+-- deploy the packaged *.zip file (--pn) at the package directory (--pd) and apply the changes to the target database, if the package name is not specified it takes the most current
+db-advance.exe --deploy --db=Northwind --pd="c:\temp\Northwind\packages" --pn="northwind.zip"
+
+-- drop, re-create the target database and apply all scripts:
+db-abvance.exe --refresh  --db=Northwind --sp="c:\temp\northwind"
+
+-- create the intitial script directory structure at a specific location 
+db-abvance.exe --init --sp="c:\temp\northwind"

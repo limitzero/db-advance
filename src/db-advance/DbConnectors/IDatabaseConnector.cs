@@ -1,5 +1,4 @@
 using System;
-using DbAdvance.Host.Package;
 
 namespace DbAdvance.Host.DbConnectors
 {
@@ -18,5 +17,7 @@ namespace DbAdvance.Host.DbConnectors
         string GetDatabaseName();
 
         void SetBaseDatabaseVersion(string version);
+
+        bool DatabaseExists();
     }
 }

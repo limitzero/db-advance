@@ -11,13 +11,5 @@ namespace DbAdvance.Host.Commands.Steps.FolderRunStrategy
         {
             get { return FolderStructure.Up; }
         }
-
-        public override void Execute(CommandPipelineContext context,
-            IDatabaseConnector connector,
-            IEnumerable<ScriptAccessor> scripts)
-        {
-            if (context.Options.Install)
-                base.Execute(context, connector, scripts);
-        }
     }
 }

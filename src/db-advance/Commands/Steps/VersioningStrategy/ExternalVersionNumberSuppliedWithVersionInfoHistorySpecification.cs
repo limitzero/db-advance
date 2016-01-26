@@ -22,6 +22,8 @@ namespace DbAdvance.Host.Commands.Steps.VersioningStrategy
 
         public override void ExecuteVersioningStrategy(string currentVersion, string desiredVersion)
         {
+            base.Logger.InfoFormat("Creating version with supplied value in version information table...");
+
             var version = CreateNewVersion();
             version.Version = desiredVersion;
             UpdateVersionInfo(version);

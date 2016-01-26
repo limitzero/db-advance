@@ -22,8 +22,6 @@ namespace DbAdvance.Host.DbConnectors
 
         public void Apply(string statement)
         {
-            //var tempPath = Path.Combine(Path.GetTempFileName(), "DbAdvanceNet");
-            //var filePath = Path.Combine(tempPath, string.Format("{0}-dynamic.sql", Guid.NewGuid().ToString("D")));
             var file = Path.GetTempFileName();
             File.WriteAllText(file, statement);
 
@@ -93,7 +91,6 @@ namespace DbAdvance.Host.DbConnectors
             SetVersion(VersionType.BaseVersion, version);
         }
 
-
         protected void SetVersion(VersionType parameterName, string version)
         {
             if (!DatabaseExists())
@@ -111,7 +108,7 @@ namespace DbAdvance.Host.DbConnectors
             }
         }
 
-        protected bool DatabaseExists()
+        public bool DatabaseExists()
         {
             using (var currentConnection = new SqlConnection(Configuration.ConnectionString))
             {

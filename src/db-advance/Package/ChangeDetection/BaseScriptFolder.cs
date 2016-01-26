@@ -7,6 +7,7 @@ using Castle.MicroKernel;
 using Dapper;
 using DbAdvance.Host.DbConnectors;
 using DbAdvance.Host.Models.Entities;
+using DbAdvance.Host.Usages;
 
 namespace DbAdvance.Host.Package.ChangeDetection
 {
@@ -15,7 +16,7 @@ namespace DbAdvance.Host.Package.ChangeDetection
         public IKernel Kernel { get; private set; }
         public IFileSystem FileSystem { get; private set; }
         public IDatabaseConnectorConfiguration Configuration { get; private set; }
-        public DbAdvanceCommandLineOptions Options { get; set; }
+        public DbAdvancedOptions Options { get; set; }
 
         public abstract string Folder { get; }
 
@@ -37,7 +38,7 @@ namespace DbAdvance.Host.Package.ChangeDetection
 
         protected IEnumerable<ScriptAccessor> GetNonEnvironmentSpecificScriptsFromFolder()
         {
-            var path = Path.Combine(Options.Path, Folder);
+            var path = Path.Combine(Options.ScriptsPath, Folder);
             var files = new HashSet<string>();
             FileSystem.GetFilesInPath(files, path, string.Format("*{0}", 
                 FolderStructure.ScriptFileExtension));
@@ -54,7 +55,7 @@ namespace DbAdvance.Host.Package.ChangeDetection
             if (string.IsNullOrEmpty(Options.Environment))
                 return new List<ScriptAccessor>();
 
-            var path = Path.Combine(Options.Path, Folder);
+            var path = Path.Combine(Options.ScriptsPath, Folder);
             var environmentFiles = new HashSet<string>();
             FileSystem.GetFilesInPath(environmentFiles, path,
                 string.Format("*{0}", FolderStructure.EnvironmentScriptFileExtension));

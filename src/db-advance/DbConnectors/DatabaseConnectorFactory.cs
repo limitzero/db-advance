@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using Castle.Core.Logging;
+using DbAdvance.Host.Usages;
 
 namespace DbAdvance.Host.DbConnectors
 {
@@ -8,11 +9,11 @@ namespace DbAdvance.Host.DbConnectors
     {
         private readonly ILogger _logger;
         private readonly IDatabaseConnectorConfiguration _configuration;
-        private readonly DbAdvanceCommandLineOptions _options;
+        private readonly DbAdvancedOptions _options;
 
         public DatabaseConnectorFactory(ILogger logger, 
             IDatabaseConnectorConfiguration configuration, 
-            DbAdvanceCommandLineOptions options)
+            DbAdvancedOptions options)
         {
             this._logger = logger;
             this._configuration = configuration;
@@ -21,7 +22,7 @@ namespace DbAdvance.Host.DbConnectors
 
         public IDatabaseConnector Create()
         {
-            if (_options.UseSqlCmdUtility)
+            if (_options.UseSqlCmd)
             {
                 return new SqlCmdDatabaseConnector(new SqlCmdRunner(_logger), _logger, _configuration);
             }
@@ -34,6 +35,11 @@ namespace DbAdvance.Host.DbConnectors
             var connection = new SqlConnection(_configuration.ConnectionString);
             connection.Open();
             return connection;
+        }
+
+        public IDatabaseConnector UseSqlCmdConnector()
+        {
+            return new SqlCmdDatabaseConnector(new SqlCmdRunner(_logger), _logger, _configuration);
         }
 
         public IDatabaseConnector UseBasicConnector()

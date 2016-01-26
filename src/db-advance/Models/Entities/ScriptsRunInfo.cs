@@ -12,7 +12,7 @@ namespace DbAdvance.Host.Models.Entities
 
         [Key]
         public long Id { get; set; }
-        public string Version { get; set; }
+        public long? VersionInfoId { get; set; }
         public string Tag { get; set; }
         public long? DeployInfoId { get; set; }
         public string ScriptName { get; set; }

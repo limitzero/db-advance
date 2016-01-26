@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Castle.MicroKernel;
+using Dapper;
 using Dapper.Contrib.Extensions;
 using DbAdvance.Host.DbConnectors;
 using DbAdvance.Host.Models.Entities;
@@ -26,10 +27,6 @@ namespace DbAdvance.Host.Commands.Steps
 
         public override void Execute(CommandPipelineContext context)
         {
-            Logger.WriteBanner();
-
-            Logger.Info("STAGE: Upgrading database via pending scripts");
-
             var connector = _factory.Create();
 
             connector.OnScriptExecuted += OnScriptExecuted;
@@ -39,8 +36,6 @@ namespace DbAdvance.Host.Commands.Steps
             connector.OnScriptExecuted -= OnScriptExecuted;
 
             ApplyResultsToInfoTables(context);
-
-            Logger.WriteBanner();
         }
 
         private void ExecuteScriptsAsDeltas(
@@ -84,8 +79,7 @@ namespace DbAdvance.Host.Commands.Steps
                     EntryDate = System.DateTime.Now,
                     ScriptName = Path.GetFileName(r.Script.GetFullPath()),
                     ScriptText = r.Script.Read(),
-                    Tag = r.Script.Tag ?? string.Empty,
-                    Version = context.ToVersion
+                    Tag = r.Script.Tag ?? string.Empty
                 })
                 .Distinct()
                 .ToList();
@@ -111,8 +105,7 @@ namespace DbAdvance.Host.Commands.Steps
                     EntryDate = System.DateTime.Now,
                     ScriptName = r.Script.ToString(),
                     ScriptText = r.Script.Read(),
-                    ScriptError = string.Join(Environment.NewLine, r.Errors),
-                    Version = context.ToVersion
+                    ScriptError = string.Join(Environment.NewLine, r.Errors)
                 })
                 .Distinct()
                 .ToList();

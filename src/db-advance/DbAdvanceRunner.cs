@@ -3,6 +3,7 @@ using Castle.Core.Logging;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using DbAdvance.Host.Commands;
+using DbAdvance.Host.Usages;
 
 namespace DbAdvance.Host
 {
@@ -26,8 +27,7 @@ namespace DbAdvance.Host
 
             try
             {
-                SetupDatabaseEnvironment(pipelineConnector);
-                ApplyDesiredCommandToDatabase(options, pipelineConnector);
+                RunDesiredCommand(options, pipelineConnector);  
             }
             catch (Exception runnerException)
             {
@@ -37,30 +37,20 @@ namespace DbAdvance.Host
             ExitRunnerWithSuccess(options);
         }
 
-        private void ApplyCommand(DbAdvanceCommandLineOptions options,
-            CommandPipelineFactoryConnector connector)
-        {
-        }
-
-        private void SetupDatabaseEnvironment(CommandPipelineFactoryConnector connector)
-        {
-            connector.Apply("setup");
-        }
-
-        private void ApplyDesiredCommandToDatabase(
-            DbAdvanceCommandLineOptions options,
+        private void RunDesiredCommand(
+            DbAdvancedOptions options,
             CommandPipelineFactoryConnector connector)
         {
             connector.Apply(options);
         }
 
-        private DbAdvanceCommandLineOptions InitializeOptionsFromCommandLineArguments(string[] args)
+        private DbAdvancedOptions InitializeOptionsFromCommandLineArguments(string[] args)
         {
-            var options = new DbAdvanceCommandLineOptions(_container.Resolve<ILogger>());
+            var options = new DbAdvancedOptions(_container.Resolve<ILogger>());
             options.Configure(args);
 
             _container.Register(Component
-                .For<DbAdvanceCommandLineOptions>()
+                .For<DbAdvancedOptions>()
                 .Instance(options));
 
             return options;
@@ -80,13 +70,13 @@ namespace DbAdvance.Host
             _container.Resolve<ILogger>().Info(environment);
         }
 
-        private void ExitRunnerWithSuccess(DbAdvanceCommandLineOptions options)
+        private void ExitRunnerWithSuccess(DbAdvancedOptions options)
         {
             InspectForInteractiveSession(options);
             Environment.Exit(0);
         }
 
-        private void ExitRunnerWithFailure(DbAdvanceCommandLineOptions options,
+        private void ExitRunnerWithFailure(DbAdvancedOptions options,
             Exception exception = null)
         {
             if (exception != null)
@@ -98,7 +88,7 @@ namespace DbAdvance.Host
             Environment.Exit(-1);
         }
 
-        private void InspectForInteractiveSession(DbAdvanceCommandLineOptions options)
+        private void InspectForInteractiveSession(DbAdvancedOptions options)
         {
             if (options.Wait)
             {

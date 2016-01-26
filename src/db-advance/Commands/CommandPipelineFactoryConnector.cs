@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Castle.MicroKernel;
 using DbAdvance.Host.Pipeline;
+using DbAdvance.Host.Usages;
 
 namespace DbAdvance.Host.Commands
 {
@@ -13,13 +14,13 @@ namespace DbAdvance.Host.Commands
             _kernel = kernel;
         }
 
-        public CommandPipelineContext Apply(DbAdvanceCommandLineOptions options)
+        public CommandPipelineContext Apply(DbAdvancedOptions options)
         {
             return Apply(options.Command, options);
         }
 
         public CommandPipelineContext Apply(string command,
-            DbAdvanceCommandLineOptions options = null)
+            DbAdvancedOptions options = null)
         {
             var pipelineFactory = _kernel
                 .ResolveAll<IPipelineFactory<CommandPipelineContext>>()
@@ -29,7 +30,7 @@ namespace DbAdvance.Host.Commands
 
             var context = new CommandPipelineContext
             {
-                Options = options ?? _kernel.Resolve<DbAdvanceCommandLineOptions>()
+                Options = options ?? _kernel.Resolve<DbAdvancedOptions>()
             };
 
             var pipeline = pipelineFactory.Create();

@@ -16,22 +16,17 @@ namespace DbAdvance.Host.Commands.Clean.Pipeline.Steps
             _configuration = configuration;
         }
 
-
         public override void Execute(CommandPipelineContext context)
         {
-            Logger.WriteBanner();
-
-            Logger.InfoFormat("Cleaning database '{0}' on instance '{1}'...",
+            Logger.InfoFormat("Creating/re-creating database '{0}' on instance '{1}'...",
                 _configuration.GetDatabaseName(),
                 _configuration.GetDatabaseServerName());
 
             CleanTargetDatabaseViaDropAndCreate(context);
 
-            Logger.InfoFormat("Database '{0}' on instance '{1}' cleaned.",
+            Logger.InfoFormat("Database '{0}' on instance '{1}' created.",
                 _configuration.GetDatabaseName(),
                 _configuration.GetDatabaseServerName());
-
-            Logger.WriteBanner();
         }
 
         private void CleanTargetDatabaseViaDropAndCreate(CommandPipelineContext context)

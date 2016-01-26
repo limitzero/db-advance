@@ -3,6 +3,9 @@ using Castle.MicroKernel;
 using DbAdvance.Host.Commands.Steps;
 using DbAdvance.Host.Package.ChangeDetection;
 using DbAdvance.Host.Pipeline;
+using DbAdvance.Host.Usages.Up.Stages._03_PreRun.Steps;
+using DbAdvance.Host.Usages.Up.Stages._05_Version.Steps;
+using DbAdvance.Host.Usages.Up.Stages._06_PostRun.Steps;
 
 namespace DbAdvance.Host.Commands
 {
